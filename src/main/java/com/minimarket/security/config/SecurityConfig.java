@@ -41,10 +41,10 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/api/productos/**", "/api/categorias/**").hasRole("ADMIN")
                         
                         // Ventas, Detalles e Inventario (EMPLEADO y ADMIN)
-                        .requestMatchers("/api/ventas/**", "/api/detalles-ventas/**", "/api/inventarios/**").hasAnyRole("EMPLEADO", "ADMIN")
+                        .requestMatchers("/api/ventas/**", "/api/detalle-ventas/**", "/api/inventario/**").hasAnyRole("EMPLEADO", "ADMIN")
                         
                         // Carrito (CLIENTE, EMPLEADO y ADMIN)
-                        .requestMatchers("/api/carritos/**").hasAnyRole("CLIENTE", "EMPLEADO", "ADMIN")
+                        .requestMatchers("/api/carrito/**").hasAnyRole("CLIENTE", "EMPLEADO", "ADMIN")
                         
                         // Cualquier otra ruta requiere autenticación
                         .anyRequest().authenticated()
