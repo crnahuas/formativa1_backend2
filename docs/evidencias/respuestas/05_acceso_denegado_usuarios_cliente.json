@@ -1,0 +1,10 @@
+{
+  "method": "GET",
+  "url": "http://localhost:8080/api/usuarios",
+  "status": 403,
+  "requestBody": null,
+  "responseBody": {
+    "error": "Acceso denegado",
+    "message": "No tiene permisos para acceder a este recurso"
+  }
+}

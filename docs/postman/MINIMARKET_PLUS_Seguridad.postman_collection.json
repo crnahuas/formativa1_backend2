@@ -1,13 +1,28 @@
 {
   "info": {
-    "name": "MINIMARKET PLUS - Seguridad",
-    "description": "Pruebas de autenticacion y autorizacion para MINIMARKET PLUS con Java 21 y Spring Boot 4.0.6.",
+    "name": "MINIMARKET PLUS - Seguridad JWT",
+    "description": "Pruebas de autenticacion y autorizacion para MINIMARKET PLUS con Spring Security, JWT, BCrypt y roles CLIENTE, EMPLEADO y GERENTE.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
     {
       "key": "baseUrl",
       "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "clienteToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "empleadoToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "gerenteToken",
+      "value": "",
       "type": "string"
     }
   ],
@@ -25,19 +40,158 @@
           "script": {
             "type": "text/javascript",
             "exec": [
-              "pm.test('HTTP 200 OK', function () {",
-              "  pm.response.to.have.status(200);",
-              "});",
-              "pm.test('Respuesta contiene Hola Mundo', function () {",
-              "  pm.expect(pm.response.text()).to.include('Hola Mundo');",
-              "});"
+              "pm.test('HTTP 200 OK', function () { pm.response.to.have.status(200); });",
+              "pm.test('Respuesta contiene Hola Mundo', function () { pm.expect(pm.response.text()).to.include('Hola Mundo'); });"
             ]
           }
         }
       ]
     },
     {
-      "name": "02 Protegido sin autenticacion - Productos",
+      "name": "02 Registro - Nuevo cliente",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": "{{baseUrl}}/api/auth/register",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"username\": \"cliente_postman\", \"password\": \"cliente12345\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 201 Created o 409 si ya existe', function () { pm.expect([201, 409]).to.include(pm.response.code); });",
+              "if (pm.response.code === 201) { pm.test('Registro asigna ROLE_CLIENTE', function () { pm.expect(pm.response.json().roles).to.include('ROLE_CLIENTE'); }); }"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 Login - Cliente",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": "{{baseUrl}}/api/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"username\": \"cliente\", \"password\": \"cliente123\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200 OK', function () { pm.response.to.have.status(200); });",
+              "pm.test('Respuesta contiene JWT', function () { pm.expect(pm.response.json().token).to.be.a('string'); });",
+              "pm.collectionVariables.set('clienteToken', pm.response.json().token);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "04 Login - Empleado",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": "{{baseUrl}}/api/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"username\": \"empleado\", \"password\": \"empleado123\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200 OK', function () { pm.response.to.have.status(200); });",
+              "pm.test('Respuesta contiene JWT', function () { pm.expect(pm.response.json().token).to.be.a('string'); });",
+              "pm.collectionVariables.set('empleadoToken', pm.response.json().token);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "05 Login - Gerente",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": "{{baseUrl}}/api/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"username\": \"gerente\", \"password\": \"gerente123\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200 OK', function () { pm.response.to.have.status(200); });",
+              "pm.test('Respuesta contiene JWT', function () { pm.expect(pm.response.json().token).to.be.a('string'); });",
+              "pm.collectionVariables.set('gerenteToken', pm.response.json().token);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "06 Protegido sin token - Productos",
       "request": {
         "method": "GET",
         "header": [],
@@ -49,34 +203,23 @@
           "script": {
             "type": "text/javascript",
             "exec": [
-              "pm.test('HTTP 401 Unauthorized', function () {",
-              "  pm.response.to.have.status(401);",
-              "});"
+              "pm.test('HTTP 401 Unauthorized', function () { pm.response.to.have.status(401); });"
             ]
           }
         }
       ]
     },
     {
-      "name": "03 Cliente - Consulta productos",
+      "name": "07 Cliente autorizado - Productos",
       "request": {
-        "auth": {
-          "type": "basic",
-          "basic": [
-            {
-              "key": "username",
-              "value": "cliente",
-              "type": "string"
-            },
-            {
-              "key": "password",
-              "value": "cliente123",
-              "type": "string"
-            }
-          ]
-        },
         "method": "GET",
-        "header": [],
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{clienteToken}}",
+            "type": "text"
+          }
+        ],
         "url": "{{baseUrl}}/api/productos"
       },
       "event": [
@@ -85,37 +228,24 @@
           "script": {
             "type": "text/javascript",
             "exec": [
-              "pm.test('HTTP 200 OK', function () {",
-              "  pm.response.to.have.status(200);",
-              "});",
-              "pm.test('Respuesta JSON es lista', function () {",
-              "  pm.expect(pm.response.json()).to.be.an('array');",
-              "});"
+              "pm.test('HTTP 200 OK', function () { pm.response.to.have.status(200); });",
+              "pm.test('Respuesta JSON es lista', function () { pm.expect(pm.response.json()).to.be.an('array'); });"
             ]
           }
         }
       ]
     },
     {
-      "name": "04 Cliente bloqueado - Usuarios",
+      "name": "08 Cliente denegado - Usuarios",
       "request": {
-        "auth": {
-          "type": "basic",
-          "basic": [
-            {
-              "key": "username",
-              "value": "cliente",
-              "type": "string"
-            },
-            {
-              "key": "password",
-              "value": "cliente123",
-              "type": "string"
-            }
-          ]
-        },
         "method": "GET",
-        "header": [],
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{clienteToken}}",
+            "type": "text"
+          }
+        ],
         "url": "{{baseUrl}}/api/usuarios"
       },
       "event": [
@@ -124,34 +254,23 @@
           "script": {
             "type": "text/javascript",
             "exec": [
-              "pm.test('HTTP 403 Forbidden', function () {",
-              "  pm.response.to.have.status(403);",
-              "});"
+              "pm.test('HTTP 403 Forbidden', function () { pm.response.to.have.status(403); });"
             ]
           }
         }
       ]
     },
     {
-      "name": "05 Admin - Consulta usuarios sin password",
+      "name": "09 Gerente autorizado - Usuarios sin password",
       "request": {
-        "auth": {
-          "type": "basic",
-          "basic": [
-            {
-              "key": "username",
-              "value": "admin",
-              "type": "string"
-            },
-            {
-              "key": "password",
-              "value": "admin123",
-              "type": "string"
-            }
-          ]
-        },
         "method": "GET",
-        "header": [],
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{gerenteToken}}",
+            "type": "text"
+          }
+        ],
         "url": "{{baseUrl}}/api/usuarios"
       },
       "event": [
@@ -160,37 +279,24 @@
           "script": {
             "type": "text/javascript",
             "exec": [
-              "pm.test('HTTP 200 OK', function () {",
-              "  pm.response.to.have.status(200);",
-              "});",
-              "pm.test('No expone password en JSON', function () {",
-              "  pm.expect(pm.response.text()).to.not.include('password');",
-              "});"
+              "pm.test('HTTP 200 OK', function () { pm.response.to.have.status(200); });",
+              "pm.test('No expone password en JSON', function () { pm.expect(pm.response.text()).to.not.include('password'); });"
             ]
           }
         }
       ]
     },
     {
-      "name": "06 Cliente bloqueado - Inventario",
+      "name": "10 Cliente denegado - Inventario",
       "request": {
-        "auth": {
-          "type": "basic",
-          "basic": [
-            {
-              "key": "username",
-              "value": "cliente",
-              "type": "string"
-            },
-            {
-              "key": "password",
-              "value": "cliente123",
-              "type": "string"
-            }
-          ]
-        },
         "method": "GET",
-        "header": [],
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{clienteToken}}",
+            "type": "text"
+          }
+        ],
         "url": "{{baseUrl}}/api/inventario"
       },
       "event": [
@@ -199,34 +305,23 @@
           "script": {
             "type": "text/javascript",
             "exec": [
-              "pm.test('HTTP 403 Forbidden', function () {",
-              "  pm.response.to.have.status(403);",
-              "});"
+              "pm.test('HTTP 403 Forbidden', function () { pm.response.to.have.status(403); });"
             ]
           }
         }
       ]
     },
     {
-      "name": "07 Empleado - Consulta inventario",
+      "name": "11 Empleado autorizado - Inventario",
       "request": {
-        "auth": {
-          "type": "basic",
-          "basic": [
-            {
-              "key": "username",
-              "value": "empleado",
-              "type": "string"
-            },
-            {
-              "key": "password",
-              "value": "empleado123",
-              "type": "string"
-            }
-          ]
-        },
         "method": "GET",
-        "header": [],
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{empleadoToken}}",
+            "type": "text"
+          }
+        ],
         "url": "{{baseUrl}}/api/inventario"
       },
       "event": [
@@ -235,70 +330,23 @@
           "script": {
             "type": "text/javascript",
             "exec": [
-              "pm.test('HTTP 200 OK', function () {",
-              "  pm.response.to.have.status(200);",
-              "});"
+              "pm.test('HTTP 200 OK', function () { pm.response.to.have.status(200); });"
             ]
           }
         }
       ]
     },
     {
-      "name": "08 Cliente - Consulta carrito",
+      "name": "12 Empleado autorizado - Detalle ventas",
       "request": {
-        "auth": {
-          "type": "basic",
-          "basic": [
-            {
-              "key": "username",
-              "value": "cliente",
-              "type": "string"
-            },
-            {
-              "key": "password",
-              "value": "cliente123",
-              "type": "string"
-            }
-          ]
-        },
         "method": "GET",
-        "header": [],
-        "url": "{{baseUrl}}/api/carrito"
-      },
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "pm.test('HTTP 200 OK', function () {",
-              "  pm.response.to.have.status(200);",
-              "});"
-            ]
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{empleadoToken}}",
+            "type": "text"
           }
-        }
-      ]
-    },
-    {
-      "name": "09 Cliente bloqueado - Detalle ventas",
-      "request": {
-        "auth": {
-          "type": "basic",
-          "basic": [
-            {
-              "key": "username",
-              "value": "cliente",
-              "type": "string"
-            },
-            {
-              "key": "password",
-              "value": "cliente123",
-              "type": "string"
-            }
-          ]
-        },
-        "method": "GET",
-        "header": [],
+        ],
         "url": "{{baseUrl}}/api/detalle-ventas"
       },
       "event": [
@@ -307,45 +355,7 @@
           "script": {
             "type": "text/javascript",
             "exec": [
-              "pm.test('HTTP 403 Forbidden', function () {",
-              "  pm.response.to.have.status(403);",
-              "});"
-            ]
-          }
-        }
-      ]
-    },
-    {
-      "name": "10 Empleado - Consulta detalle ventas",
-      "request": {
-        "auth": {
-          "type": "basic",
-          "basic": [
-            {
-              "key": "username",
-              "value": "empleado",
-              "type": "string"
-            },
-            {
-              "key": "password",
-              "value": "empleado123",
-              "type": "string"
-            }
-          ]
-        },
-        "method": "GET",
-        "header": [],
-        "url": "{{baseUrl}}/api/detalle-ventas"
-      },
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "pm.test('HTTP 200 OK', function () {",
-              "  pm.response.to.have.status(200);",
-              "});"
+              "pm.test('HTTP 200 OK', function () { pm.response.to.have.status(200); });"
             ]
           }
         }

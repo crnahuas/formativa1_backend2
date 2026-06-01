@@ -1,0 +1,16 @@
+{
+  "method": "POST",
+  "url": "http://localhost:8080/api/auth/register",
+  "status": 201,
+  "requestBody": {
+    "username": "evidencia_cliente_1780354866",
+    "password": "cliente12345"
+  },
+  "responseBody": {
+    "id": 4,
+    "username": "evidencia_cliente_1780354866",
+    "roles": [
+      "ROLE_CLIENTE"
+    ]
+  }
+}
