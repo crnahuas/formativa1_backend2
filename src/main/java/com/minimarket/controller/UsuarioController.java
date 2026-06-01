@@ -1,13 +1,16 @@
 package com.minimarket.controller;
 
+import com.minimarket.dto.usuario.UsuarioResponse;
 import com.minimarket.entity.Usuario;
 import com.minimarket.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/usuarios")
@@ -17,23 +20,30 @@ public class UsuarioController {
     private UsuarioService usuarioService;
 
     @GetMapping
-    public List<Usuario> listarUsuarios() {
-        return usuarioService.findAll();
+    @PreAuthorize("hasRole('GERENTE')")
+    public List<UsuarioResponse> listarUsuarios() {
+        return usuarioService.findAll().stream()
+                .map(UsuarioResponse::fromEntity)
+                .collect(Collectors.toList());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Usuario> obtenerUsuarioPorId(@PathVariable Long id) {
+    @PreAuthorize("hasRole('GERENTE')")
+    public ResponseEntity<UsuarioResponse> obtenerUsuarioPorId(@PathVariable Long id) {
         Optional<Usuario> usuario = usuarioService.findById(id);
-        return usuario.map(ResponseEntity::ok) // Si el usuario existe, devuelve 200 OK con el usuario
+        return usuario.map(UsuarioResponse::fromEntity)
+                .map(ResponseEntity::ok) // Si el usuario existe, devuelve 200 OK con el usuario
                 .orElseGet(() -> ResponseEntity.notFound().build()); // Si no, devuelve 404
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('GERENTE')")
     public Usuario guardarUsuario(@RequestBody Usuario usuario) {
         return usuarioService.save(usuario);
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('GERENTE')")
     public ResponseEntity<Usuario> actualizarUsuario(@PathVariable Long id, @RequestBody Usuario usuario) {
         Optional<Usuario> usuarioExistente = usuarioService.findById(id);
         if (usuarioExistente.isPresent()) {
@@ -44,6 +54,7 @@ public class UsuarioController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('GERENTE')")
     public ResponseEntity<Void> eliminarUsuario(@PathVariable Long id) {
         Optional<Usuario> usuario = usuarioService.findById(id);
         if (usuario.isPresent()) { // Verifica si el usuario existe

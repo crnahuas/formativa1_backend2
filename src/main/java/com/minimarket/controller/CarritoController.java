@@ -4,6 +4,7 @@ import com.minimarket.entity.Carrito;
 import com.minimarket.service.CarritoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,22 +17,26 @@ public class CarritoController {
     private CarritoService carritoService;
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('CLIENTE','EMPLEADO','GERENTE')")
     public List<Carrito> listarCarrito() {
         return carritoService.findAll();
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('CLIENTE','EMPLEADO','GERENTE')")
     public ResponseEntity<Carrito> obtenerCarritoPorId(@PathVariable Long id) {
         Carrito carrito = carritoService.findById(id);
         return (carrito != null) ? ResponseEntity.ok(carrito) : ResponseEntity.notFound().build();
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('CLIENTE','EMPLEADO','GERENTE')")
     public Carrito agregarProductoAlCarrito(@RequestBody Carrito carrito) {
         return carritoService.save(carrito);
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('CLIENTE','EMPLEADO','GERENTE')")
     public ResponseEntity<Carrito> actualizarCarrito(@PathVariable Long id, @RequestBody Carrito carrito) {
         Carrito existente = carritoService.findById(id);
         if (existente != null) {
@@ -42,6 +47,7 @@ public class CarritoController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('CLIENTE','EMPLEADO','GERENTE')")
     public ResponseEntity<Void> eliminarProductoDelCarrito(@PathVariable Long id) {
         Carrito carrito = carritoService.findById(id);
         if (carrito != null) {

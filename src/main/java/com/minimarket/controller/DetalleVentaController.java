@@ -4,6 +4,7 @@ import com.minimarket.entity.DetalleVenta;
 import com.minimarket.service.DetalleVentaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,22 +17,26 @@ public class DetalleVentaController {
     private DetalleVentaService detalleVentaService;
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('EMPLEADO','GERENTE')")
     public List<DetalleVenta> listarDetalleVentas() {
         return detalleVentaService.findAll();
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('EMPLEADO','GERENTE')")
     public ResponseEntity<DetalleVenta> obtenerDetalleVentaPorId(@PathVariable Long id) {
         DetalleVenta detalleVenta = detalleVentaService.findById(id);
         return (detalleVenta != null) ? ResponseEntity.ok(detalleVenta) : ResponseEntity.notFound().build();
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('EMPLEADO','GERENTE')")
     public DetalleVenta guardarDetalleVenta(@RequestBody DetalleVenta detalleVenta) {
         return detalleVentaService.save(detalleVenta);
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('EMPLEADO','GERENTE')")
     public ResponseEntity<DetalleVenta> actualizarDetalleVenta(@PathVariable Long id, @RequestBody DetalleVenta detalleVenta) {
         DetalleVenta existente = detalleVentaService.findById(id);
         if (existente != null) {
@@ -42,6 +47,7 @@ public class DetalleVentaController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('GERENTE')")
     public ResponseEntity<Void> eliminarDetalleVenta(@PathVariable Long id) {
         DetalleVenta detalleVenta = detalleVentaService.findById(id);
         if (detalleVenta != null) {

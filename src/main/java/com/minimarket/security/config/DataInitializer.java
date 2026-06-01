@@ -15,9 +15,13 @@ import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
 import java.util.Set;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Component
 public class DataInitializer implements CommandLineRunner {
+
+    private static final Logger logger = LoggerFactory.getLogger(DataInitializer.class);
 
     @Autowired
     private RolRepository rolRepository;
@@ -39,18 +43,18 @@ public class DataInitializer implements CommandLineRunner {
         // 1. Inicializar Roles
         Rol rolCliente = getOrCreateRol("ROLE_CLIENTE");
         Rol rolEmpleado = getOrCreateRol("ROLE_EMPLEADO");
-        Rol rolAdmin = getOrCreateRol("ROLE_ADMIN");
+        Rol rolGerente = getOrCreateRol("ROLE_GERENTE");
 
         // 2. Inicializar Usuarios
-        if (!usuarioRepository.findByUsername("admin").isPresent()) {
-            Usuario admin = new Usuario();
-            admin.setUsername("admin");
-            admin.setPassword(passwordEncoder.encode("admin123"));
+        if (!usuarioRepository.findByUsername("gerente").isPresent()) {
+            Usuario gerente = new Usuario();
+            gerente.setUsername("gerente");
+            gerente.setPassword(passwordEncoder.encode("gerente123"));
             Set<Rol> roles = new HashSet<>();
-            roles.add(rolAdmin);
-            admin.setRoles(roles);
-            usuarioRepository.save(admin);
-            System.out.println("Usuario 'admin' creado exitosamente.");
+            roles.add(rolGerente);
+            gerente.setRoles(roles);
+            usuarioRepository.save(gerente);
+            logger.info("Usuario 'gerente' creado exitosamente con contrasena BCrypt.");
         }
 
         if (!usuarioRepository.findByUsername("empleado").isPresent()) {
@@ -61,7 +65,7 @@ public class DataInitializer implements CommandLineRunner {
             roles.add(rolEmpleado);
             empleado.setRoles(roles);
             usuarioRepository.save(empleado);
-            System.out.println("Usuario 'empleado' creado exitosamente.");
+            logger.info("Usuario 'empleado' creado exitosamente con contrasena BCrypt.");
         }
 
         if (!usuarioRepository.findByUsername("cliente").isPresent()) {
@@ -72,7 +76,7 @@ public class DataInitializer implements CommandLineRunner {
             roles.add(rolCliente);
             cliente.setRoles(roles);
             usuarioRepository.save(cliente);
-            System.out.println("Usuario 'cliente' creado exitosamente.");
+            logger.info("Usuario 'cliente' creado exitosamente con contrasena BCrypt.");
         }
 
         // 3. Inicializar Categorías y Productos para pruebas de endpoints
@@ -111,7 +115,7 @@ public class DataInitializer implements CommandLineRunner {
             bebidaCola.setCategoria(bebidas);
             productoRepository.save(bebidaCola);
 
-            System.out.println("Categorías y productos de prueba inicializados.");
+            logger.info("Categorias y productos de prueba inicializados.");
         }
     }
 
