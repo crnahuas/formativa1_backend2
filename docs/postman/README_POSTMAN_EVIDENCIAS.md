@@ -72,7 +72,7 @@ Ejecuta los requests en este orden:
 Esta evidencia no se obtiene desde Postman. Debes abrir la consola H2 en el navegador:
 
 ```text
-http://localhost:8080/h2-console
+http://localhost:8080/h2-console/
 ```
 
 Datos:
@@ -90,3 +90,5 @@ SELECT username, password FROM usuario;
 ```
 
 Captura donde se vea que las contrasenas aparecen como hashes BCrypt, por ejemplo con prefijo `$2a$`, `$2b$` o similar.
+
+Nota: el proyecto registra explicitamente el servlet de H2 en `/h2-console/*` para que la consola este disponible durante la ejecucion local.
