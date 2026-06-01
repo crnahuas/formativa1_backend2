@@ -9,21 +9,6 @@
       "key": "baseUrl",
       "value": "http://localhost:8080",
       "type": "string"
-    },
-    {
-      "key": "clienteToken",
-      "value": "",
-      "type": "string"
-    },
-    {
-      "key": "empleadoToken",
-      "value": "",
-      "type": "string"
-    },
-    {
-      "key": "gerenteToken",
-      "value": "",
-      "type": "string"
     }
   ],
   "item": [
@@ -112,7 +97,7 @@
             "exec": [
               "pm.test('HTTP 200 OK', function () { pm.response.to.have.status(200); });",
               "pm.test('Respuesta contiene JWT', function () { pm.expect(pm.response.json().token).to.be.a('string'); });",
-              "pm.collectionVariables.set('clienteToken', pm.response.json().token);"
+              "pm.environment.set('clienteToken', pm.response.json().token);"
             ]
           }
         }
@@ -148,7 +133,7 @@
             "exec": [
               "pm.test('HTTP 200 OK', function () { pm.response.to.have.status(200); });",
               "pm.test('Respuesta contiene JWT', function () { pm.expect(pm.response.json().token).to.be.a('string'); });",
-              "pm.collectionVariables.set('empleadoToken', pm.response.json().token);"
+              "pm.environment.set('empleadoToken', pm.response.json().token);"
             ]
           }
         }
@@ -184,7 +169,7 @@
             "exec": [
               "pm.test('HTTP 200 OK', function () { pm.response.to.have.status(200); });",
               "pm.test('Respuesta contiene JWT', function () { pm.expect(pm.response.json().token).to.be.a('string'); });",
-              "pm.collectionVariables.set('gerenteToken', pm.response.json().token);"
+              "pm.environment.set('gerenteToken', pm.response.json().token);"
             ]
           }
         }
