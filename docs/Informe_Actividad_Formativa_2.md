@@ -22,6 +22,10 @@ Esta estrategia es adecuada para APIs REST y microservicios porque reduce depend
 
 ## 3. Implementacion realizada
 
+Para esta nueva entrega se completo la seguridad del backend existente sin reemplazar la arquitectura base del proyecto. Se reutilizaron las entidades `Usuario` y `Rol`, el repositorio de usuarios, los servicios existentes y los controladores del dominio MINIMARKET PLUS. Sobre esa base se agrego una capa de autenticacion JWT y autorizacion por roles, alineada con los requerimientos de la pauta.
+
+El cambio principal fue reemplazar el enfoque de autenticacion web tradicional por una API REST stateless. Por ello se deshabilitaron `formLogin`, `httpBasic`, `logout` y CSRF, y se incorporo un filtro propio que procesa el encabezado `Authorization: Bearer <token>` antes de que Spring Security evalue los permisos del endpoint.
+
 Clases creadas:
 
 - `com.minimarket.dto.auth.LoginRequest`
@@ -32,16 +36,28 @@ Clases creadas:
 - `com.minimarket.security.filter.JwtAuthenticationFilter`
 - `com.minimarket.exception.ErrorResponse`
 - `com.minimarket.exception.GlobalExceptionHandler`
+- `com.minimarket.security.config.H2ConsoleConfig`
 
 Clases modificadas:
 
-- `pom.xml`: dependencias de validacion y JJWT.
+- `pom.xml`: dependencias de validacion, JJWT y H2 disponible para registrar la consola local.
 - `SecurityConfig`: configuracion stateless, filtro JWT, autorizacion por roles y errores 401/403.
 - `JwtUtil`: generacion, firma, expiracion y validacion de JWT.
 - `DataInitializer`: roles `ROLE_CLIENTE`, `ROLE_EMPLEADO`, `ROLE_GERENTE` y usuarios de prueba.
 - Controladores de negocio: reglas `@PreAuthorize`.
 - `UsuarioController`: respuesta con DTO para no exponer password.
 - `application.properties`: secreto y expiracion JWT.
+
+Endpoints incorporados:
+
+- `POST /api/auth/register`: registra usuarios nuevos con rol `ROLE_CLIENTE` y contrasena cifrada.
+- `POST /api/auth/login`: valida credenciales y retorna un JWT firmado.
+
+Usuarios iniciales para pruebas:
+
+- `cliente / cliente123` con rol `ROLE_CLIENTE`.
+- `empleado / empleado123` con rol `ROLE_EMPLEADO`.
+- `gerente / gerente123` con rol `ROLE_GERENTE`.
 
 ## 4. Flujo de autenticacion
 
@@ -72,96 +88,27 @@ La autorizacion se aplica en dos niveles:
 
 ## 6. Evidencias de funcionamiento
 
-Comando de login:
+Las evidencias fueron capturadas manualmente en Postman y en la consola H2. La coleccion utilizada se encuentra en `docs/postman/MINIMARKET_PLUS_Seguridad.postman_collection.json` y el ambiente en `docs/postman/MINIMARKET_PLUS_Local.postman_environment.json`.
 
-```bash
-curl -X POST http://localhost:8080/api/auth/login \
-  -H 'Content-Type: application/json' \
-  -d '{"username":"cliente","password":"cliente123"}'
-```
+Las capturas originales se guardaron en `docs/evidencias/postman_manual/`.
 
-Resultado observado:
+Evidencias capturadas:
 
-```text
-JWT generado con prefijo: eyJhbGciOiJIUzI1NiJ9
-```
+- `01_publico_hola.png`: endpoint publico `GET /public/hola`, respuesta `200 OK`.
+- `02_registro_nuevo_cliente.png`: registro de usuario por `POST /api/auth/register`, respuesta `201 Created` con rol `ROLE_CLIENTE`.
+- `03_login_cliente.png`: login de cliente por `POST /api/auth/login`, respuesta `200 OK` con token JWT.
+- `04_login_empleado.png`: login de empleado, respuesta `200 OK` con token JWT y rol `ROLE_EMPLEADO`.
+- `05_login_gerente.png`: login de gerente, respuesta `200 OK` con token JWT y rol `ROLE_GERENTE`.
+- `06_protegido_sin_token_productos.png`: intento de acceder a `GET /api/productos` sin token, respuesta `401 Unauthorized`.
+- `07_cliente_autorizado_productos.png`: cliente accede a productos con JWT, respuesta `200 OK`.
+- `08_cliente_denegado_usuarios.png`: cliente intenta acceder a usuarios, respuesta `403 Forbidden`.
+- `09_gerente_autorizado_usuarios.png`: gerente accede a usuarios, respuesta `200 OK`; no se expone el campo `password`.
+- `10_cliente_denegado_inventario.png`: cliente intenta acceder a inventario, respuesta `403 Forbidden`.
+- `11_empleado_autorizado_inventario.png`: empleado accede a inventario, respuesta `200 OK`.
+- `12_empleado_autorizado_detalle_ventas.png`: empleado accede a detalle de ventas, respuesta `200 OK`.
+- `13_h2_passwords_bcrypt.png`: consulta H2 `SELECT username, password FROM usuario;`, donde se observa que las contrasenas estan cifradas con BCrypt.
 
-Registro de usuario:
-
-```bash
-curl -X POST http://localhost:8080/api/auth/register \
-  -H 'Content-Type: application/json' \
-  -d '{"username":"cliente_nuevo","password":"cliente12345"}'
-```
-
-Resultado observado:
-
-```json
-{"id":4,"username":"cliente_nuevo","roles":["ROLE_CLIENTE"]}
-```
-
-Acceso autorizado con rol `CLIENTE`:
-
-```bash
-curl -H "Authorization: Bearer <TOKEN_CLIENTE>" \
-  http://localhost:8080/api/productos
-```
-
-Resultado observado:
-
-```text
-HTTP 200
-```
-
-Acceso denegado por rol:
-
-```bash
-curl -H "Authorization: Bearer <TOKEN_CLIENTE>" \
-  http://localhost:8080/api/usuarios
-```
-
-Resultado observado:
-
-```text
-HTTP 403
-```
-
-Acceso autorizado con rol `GERENTE`:
-
-```bash
-curl -H "Authorization: Bearer <TOKEN_GERENTE>" \
-  http://localhost:8080/api/usuarios
-```
-
-Resultado observado:
-
-```json
-[
-  {"id":1,"username":"gerente","roles":["ROLE_GERENTE"]},
-  {"id":2,"username":"empleado","roles":["ROLE_EMPLEADO"]},
-  {"id":3,"username":"cliente","roles":["ROLE_CLIENTE"]}
-]
-```
-
-Solicitud sin token:
-
-```bash
-curl http://localhost:8080/api/productos
-```
-
-Resultado observado:
-
-```json
-{"error":"No autenticado","message":"Debe enviar un token JWT valido"}
-```
-
-Verificacion de contrasenas cifradas en H2:
-
-```sql
-SELECT username, password FROM usuario;
-```
-
-Las contrasenas se almacenan con hash BCrypt, reconocible por prefijos como `$2a$`, `$2b$` o `$2y$`, no como texto plano.
+Estas evidencias demuestran que el backend diferencia correctamente autenticacion y autorizacion: primero valida la identidad mediante login y token JWT, y luego aplica permisos segun el rol del usuario autenticado.
 
 ## 7. Proteccion frente a amenazas
 
