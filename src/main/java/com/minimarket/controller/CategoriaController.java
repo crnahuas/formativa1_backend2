@@ -1,6 +1,7 @@
 package com.minimarket.controller;
 
 import com.minimarket.entity.Categoria;
+import com.minimarket.security.config.SecurityRoles;
 import com.minimarket.service.CategoriaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,26 +18,26 @@ public class CategoriaController {
     private CategoriaService categoriaService;
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('CLIENTE','EMPLEADO','GERENTE')")
+    @PreAuthorize(SecurityRoles.HAS_ROLE_CLIENTE_EMPLEADO_OR_GERENTE)
     public List<Categoria> listarCategorias() {
         return categoriaService.findAll();
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('CLIENTE','EMPLEADO','GERENTE')")
+    @PreAuthorize(SecurityRoles.HAS_ROLE_CLIENTE_EMPLEADO_OR_GERENTE)
     public ResponseEntity<Categoria> obtenerCategoriaPorId(@PathVariable Long id) {
         Categoria categoria = categoriaService.findById(id);
         return (categoria != null) ? ResponseEntity.ok(categoria) : ResponseEntity.notFound().build();
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('EMPLEADO','GERENTE')")
+    @PreAuthorize(SecurityRoles.HAS_ROLE_EMPLEADO_OR_GERENTE)
     public Categoria guardarCategoria(@RequestBody Categoria categoria) {
         return categoriaService.save(categoria);
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('EMPLEADO','GERENTE')")
+    @PreAuthorize(SecurityRoles.HAS_ROLE_EMPLEADO_OR_GERENTE)
     public ResponseEntity<Categoria> actualizarCategoria(@PathVariable Long id, @RequestBody Categoria categoria) {
         Categoria categoriaExistente = categoriaService.findById(id);
         if (categoriaExistente != null) {
@@ -47,7 +48,7 @@ public class CategoriaController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('GERENTE')")
+    @PreAuthorize(SecurityRoles.HAS_ROLE_GERENTE)
     public ResponseEntity<Void> eliminarCategoria(@PathVariable Long id) {
         Categoria categoria = categoriaService.findById(id);
         if (categoria != null) {

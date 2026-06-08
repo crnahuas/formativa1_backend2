@@ -1,7 +1,7 @@
 {
   "info": {
-    "name": "MINIMARKET PLUS - Seguridad JWT",
-    "description": "Pruebas de autenticacion y autorizacion para MINIMARKET PLUS con Spring Security, JWT, BCrypt y roles CLIENTE, EMPLEADO y GERENTE.",
+    "name": "MINIMARKET PLUS - Evidencias Semana 3",
+    "description": "Coleccion para capturar evidencias de autenticacion, JWT, roles y amenazas comunes.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -13,336 +13,499 @@
   ],
   "item": [
     {
-      "name": "01 Publico - Hola",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": "{{baseUrl}}/public/hola"
-      },
-      "event": [
+      "name": "01 Preparacion",
+      "item": [
         {
-          "listen": "test",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "pm.test('HTTP 200 OK', function () { pm.response.to.have.status(200); });",
-              "pm.test('Respuesta contiene Hola Mundo', function () { pm.expect(pm.response.text()).to.include('Hola Mundo'); });"
-            ]
-          }
-        }
-      ]
-    },
-    {
-      "name": "02 Registro - Nuevo cliente",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json",
-            "type": "text"
-          }
-        ],
-        "url": "{{baseUrl}}/api/auth/register",
-        "body": {
-          "mode": "raw",
-          "raw": "{\"username\": \"cliente_postman\", \"password\": \"cliente12345\"}",
-          "options": {
-            "raw": {
-              "language": "json"
+          "name": "01 Publico - Hola",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/public/hola"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200 OK', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Endpoint publico responde', function () { pm.expect(pm.response.text()).to.include('Hola Mundo'); });"
+                ]
+              }
             }
-          }
-        }
-      },
-      "event": [
+          ]
+        },
         {
-          "listen": "test",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "pm.test('HTTP 201 Created o 409 si ya existe', function () { pm.expect([201, 409]).to.include(pm.response.code); });",
-              "if (pm.response.code === 201) { pm.test('Registro asigna ROLE_CLIENTE', function () { pm.expect(pm.response.json().roles).to.include('ROLE_CLIENTE'); }); }"
-            ]
-          }
-        }
-      ]
-    },
-    {
-      "name": "03 Login - Cliente",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json",
-            "type": "text"
-          }
-        ],
-        "url": "{{baseUrl}}/api/auth/login",
-        "body": {
-          "mode": "raw",
-          "raw": "{\"username\": \"cliente\", \"password\": \"cliente123\"}",
-          "options": {
-            "raw": {
-              "language": "json"
+          "name": "02 Registro - Nuevo cliente",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/auth/register",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"username\": \"cliente_postman\", \"password\": \"cliente12345\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
-          }
-        }
-      },
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "pm.test('HTTP 200 OK', function () { pm.response.to.have.status(200); });",
-              "pm.test('Respuesta contiene JWT', function () { pm.expect(pm.response.json().token).to.be.a('string'); });",
-              "pm.environment.set('clienteToken', pm.response.json().token);"
-            ]
-          }
-        }
-      ]
-    },
-    {
-      "name": "04 Login - Empleado",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json",
-            "type": "text"
-          }
-        ],
-        "url": "{{baseUrl}}/api/auth/login",
-        "body": {
-          "mode": "raw",
-          "raw": "{\"username\": \"empleado\", \"password\": \"empleado123\"}",
-          "options": {
-            "raw": {
-              "language": "json"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 201 Created o 409 si ya existe', function () { pm.expect([201, 409]).to.include(pm.response.code); });",
+                  "if (pm.response.code === 201) { pm.test('Registro asigna ROLE_CLIENTE', function () { pm.expect(pm.response.json().roles).to.include('ROLE_CLIENTE'); }); }"
+                ]
+              }
             }
-          }
-        }
-      },
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "pm.test('HTTP 200 OK', function () { pm.response.to.have.status(200); });",
-              "pm.test('Respuesta contiene JWT', function () { pm.expect(pm.response.json().token).to.be.a('string'); });",
-              "pm.environment.set('empleadoToken', pm.response.json().token);"
-            ]
-          }
+          ]
         }
       ]
     },
     {
-      "name": "05 Login - Gerente",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json",
-            "type": "text"
-          }
-        ],
-        "url": "{{baseUrl}}/api/auth/login",
-        "body": {
-          "mode": "raw",
-          "raw": "{\"username\": \"gerente\", \"password\": \"gerente123\"}",
-          "options": {
-            "raw": {
-              "language": "json"
+      "name": "02 Autenticacion JWT",
+      "item": [
+        {
+          "name": "03 Login - Cliente",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"username\": \"cliente\", \"password\": \"cliente123\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             }
-          }
-        }
-      },
-      "event": [
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200 OK', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Respuesta contiene JWT y rol', function () { var json = pm.response.json(); pm.expect(json.token).to.be.a('string'); pm.expect(json.roles).to.include('ROLE_CLIENTE'); });",
+                  "pm.environment.set('clienteToken', pm.response.json().token);"
+                ]
+              }
+            }
+          ]
+        },
         {
-          "listen": "test",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "pm.test('HTTP 200 OK', function () { pm.response.to.have.status(200); });",
-              "pm.test('Respuesta contiene JWT', function () { pm.expect(pm.response.json().token).to.be.a('string'); });",
-              "pm.environment.set('gerenteToken', pm.response.json().token);"
-            ]
-          }
-        }
-      ]
-    },
-    {
-      "name": "06 Protegido sin token - Productos",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": "{{baseUrl}}/api/productos"
-      },
-      "event": [
+          "name": "04 Login - Empleado",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"username\": \"empleado\", \"password\": \"empleado123\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200 OK', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Respuesta contiene JWT y rol', function () { var json = pm.response.json(); pm.expect(json.token).to.be.a('string'); pm.expect(json.roles).to.include('ROLE_EMPLEADO'); });",
+                  "pm.environment.set('empleadoToken', pm.response.json().token);"
+                ]
+              }
+            }
+          ]
+        },
         {
-          "listen": "test",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "pm.test('HTTP 401 Unauthorized', function () { pm.response.to.have.status(401); });"
-            ]
-          }
-        }
-      ]
-    },
-    {
-      "name": "07 Cliente autorizado - Productos",
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "Authorization",
-            "value": "Bearer {{clienteToken}}",
-            "type": "text"
-          }
-        ],
-        "url": "{{baseUrl}}/api/productos"
-      },
-      "event": [
+          "name": "05 Login - Gerente",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"username\": \"gerente\", \"password\": \"gerente123\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200 OK', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Respuesta contiene JWT y rol', function () { var json = pm.response.json(); pm.expect(json.token).to.be.a('string'); pm.expect(json.roles).to.include('ROLE_GERENTE'); });",
+                  "pm.environment.set('gerenteToken', pm.response.json().token);"
+                ]
+              }
+            }
+          ]
+        },
         {
-          "listen": "test",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "pm.test('HTTP 200 OK', function () { pm.response.to.have.status(200); });",
-              "pm.test('Respuesta JSON es lista', function () { pm.expect(pm.response.json()).to.be.an('array'); });"
-            ]
-          }
-        }
-      ]
-    },
-    {
-      "name": "08 Cliente denegado - Usuarios",
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "Authorization",
-            "value": "Bearer {{clienteToken}}",
-            "type": "text"
-          }
-        ],
-        "url": "{{baseUrl}}/api/usuarios"
-      },
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "pm.test('HTTP 403 Forbidden', function () { pm.response.to.have.status(403); });"
-            ]
-          }
-        }
-      ]
-    },
-    {
-      "name": "09 Gerente autorizado - Usuarios sin password",
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "Authorization",
-            "value": "Bearer {{gerenteToken}}",
-            "type": "text"
-          }
-        ],
-        "url": "{{baseUrl}}/api/usuarios"
-      },
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "pm.test('HTTP 200 OK', function () { pm.response.to.have.status(200); });",
-              "pm.test('No expone password en JSON', function () { pm.expect(pm.response.text()).to.not.include('password'); });"
-            ]
-          }
-        }
-      ]
-    },
-    {
-      "name": "10 Cliente denegado - Inventario",
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "Authorization",
-            "value": "Bearer {{clienteToken}}",
-            "type": "text"
-          }
-        ],
-        "url": "{{baseUrl}}/api/inventario"
-      },
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "pm.test('HTTP 403 Forbidden', function () { pm.response.to.have.status(403); });"
-            ]
-          }
+          "name": "06 Login fallido - Credenciales invalidas",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"username\": \"gerente\", \"password\": \"incorrecta\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 401 Unauthorized', function () { pm.response.to.have.status(401); });",
+                  "pm.test('No entrega token', function () { pm.expect(pm.response.text()).to.not.include('token'); });"
+                ]
+              }
+            }
+          ]
         }
       ]
     },
     {
-      "name": "11 Empleado autorizado - Inventario",
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "Authorization",
-            "value": "Bearer {{empleadoToken}}",
-            "type": "text"
-          }
-        ],
-        "url": "{{baseUrl}}/api/inventario"
-      },
-      "event": [
+      "name": "03 Autorizacion por roles",
+      "item": [
         {
-          "listen": "test",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "pm.test('HTTP 200 OK', function () { pm.response.to.have.status(200); });"
-            ]
-          }
+          "name": "07 Sin token - Productos protegido",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/productos"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 401 Unauthorized', function () { pm.response.to.have.status(401); });",
+                  "pm.test('Incluye cabecera WWW-Authenticate', function () { pm.expect(pm.response.headers.get('WWW-Authenticate')).to.include('Bearer'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "08 Cliente permitido - Consultar productos",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{clienteToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/productos"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200 OK', function () { pm.response.to.have.status(200); });",
+                  "pm.test('Respuesta JSON es lista', function () { pm.expect(pm.response.json()).to.be.an('array'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "09 Cliente denegado - Usuarios",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{clienteToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/usuarios"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 403 Forbidden', function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "10 Gerente permitido - Usuarios sin password",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{gerenteToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/usuarios"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200 OK', function () { pm.response.to.have.status(200); });",
+                  "pm.test('No expone password ni hash BCrypt', function () { var body = pm.response.text(); pm.expect(body).to.not.include('password'); pm.expect(body).to.not.include('$2a$'); pm.expect(body).to.not.include('$2b$'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "11 Cliente denegado - Inventario",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{clienteToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/inventario"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 403 Forbidden', function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "12 Empleado permitido - Inventario",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{empleadoToken}}",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/inventario"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200 OK', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
         }
       ]
     },
     {
-      "name": "12 Empleado autorizado - Detalle ventas",
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "Authorization",
-            "value": "Bearer {{empleadoToken}}",
-            "type": "text"
-          }
-        ],
-        "url": "{{baseUrl}}/api/detalle-ventas"
-      },
-      "event": [
+      "name": "04 Amenazas comunes",
+      "item": [
         {
-          "listen": "test",
-          "script": {
-            "type": "text/javascript",
-            "exec": [
-              "pm.test('HTTP 200 OK', function () { pm.response.to.have.status(200); });"
-            ]
-          }
+          "name": "13 Token invalido - Productos",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer token-invalido-para-evidencia",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/productos"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 401 Unauthorized', function () { pm.response.to.have.status(401); });",
+                  "pm.test('Incluye WWW-Authenticate invalid_token', function () { pm.expect(pm.response.headers.get('WWW-Authenticate')).to.include('invalid_token'); });",
+                  "pm.test('Respuesta JSON indica token invalido', function () { pm.expect(pm.response.json().message).to.include('token JWT'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "14 SQL Injection - Login no debe autenticar",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"username\": \"gerente' OR '1'='1\", \"password\": \"cualquier\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 401 Unauthorized', function () { pm.response.to.have.status(401); });",
+                  "pm.test('No entrega JWT ante payload SQLi', function () { pm.expect(pm.response.text()).to.not.include('token'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "15 XSS - Registro rechaza script en username",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/auth/register",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"username\": \"<script>alert(1)</script>\", \"password\": \"cliente12345\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 400 Bad Request', function () { pm.response.to.have.status(400); });",
+                  "pm.test('Valida campo username', function () { pm.expect(pm.response.text()).to.include('username'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "16 CSRF - POST sin JWT queda bloqueado",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": "{{baseUrl}}/api/categorias",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"nombre\": \"Categoria CSRF\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 401 Unauthorized', function () { pm.response.to.have.status(401); });",
+                  "pm.test('La API no acepta cambios sin Bearer token', function () { pm.expect(pm.response.headers.get('WWW-Authenticate')).to.include('Bearer'); });"
+                ]
+              }
+            }
+          ]
         }
       ]
     }

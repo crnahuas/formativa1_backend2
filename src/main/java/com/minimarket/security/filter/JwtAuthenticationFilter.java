@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -56,8 +57,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         } catch (JwtException | IllegalArgumentException ex) {
             logger.warn("Token JWT invalido en {} {}: {}", request.getMethod(), request.getRequestURI(), ex.getMessage());
+            SecurityContextHolder.clearContext();
+            writeUnauthorizedResponse(response);
+            return;
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    private void writeUnauthorizedResponse(HttpServletResponse response) throws IOException {
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setCharacterEncoding(StandardCharsets.UTF_8.name());
+        response.setContentType("application/json");
+        response.setHeader("WWW-Authenticate", "Bearer error=\"invalid_token\", error_description=\"Token JWT invalido o expirado\"");
+        response.getWriter().write("{\"error\":\"Token invalido\",\"message\":\"El token JWT es invalido o esta expirado\"}");
     }
 }

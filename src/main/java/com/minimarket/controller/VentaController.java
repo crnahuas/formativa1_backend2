@@ -1,6 +1,7 @@
 package com.minimarket.controller;
 
 import com.minimarket.entity.Venta;
+import com.minimarket.security.config.SecurityRoles;
 import com.minimarket.service.VentaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,20 +18,20 @@ public class VentaController {
     private VentaService ventaService;
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('EMPLEADO','GERENTE')")
+    @PreAuthorize(SecurityRoles.HAS_ROLE_EMPLEADO_OR_GERENTE)
     public List<Venta> listarVentas() {
         return ventaService.findAll();
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('EMPLEADO','GERENTE')")
+    @PreAuthorize(SecurityRoles.HAS_ROLE_EMPLEADO_OR_GERENTE)
     public ResponseEntity<Venta> obtenerVentaPorId(@PathVariable Long id) {
         Venta venta = ventaService.findById(id);
         return (venta != null) ? ResponseEntity.ok(venta) : ResponseEntity.notFound().build();
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('EMPLEADO','GERENTE')")
+    @PreAuthorize(SecurityRoles.HAS_ROLE_EMPLEADO_OR_GERENTE)
     public Venta guardarVenta(@RequestBody Venta venta) {
         return ventaService.save(venta);
     }

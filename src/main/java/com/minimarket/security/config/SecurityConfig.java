@@ -20,6 +20,10 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import static com.minimarket.security.config.SecurityRoles.CLIENTE;
+import static com.minimarket.security.config.SecurityRoles.EMPLEADO;
+import static com.minimarket.security.config.SecurityRoles.GERENTE;
+
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
@@ -48,13 +52,13 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**", "/public/**", "/h2-console/**", "/favicon.ico").permitAll()
-                        .requestMatchers("/api/usuarios/**").hasRole("GERENTE")
-                        .requestMatchers(HttpMethod.GET, "/api/productos/**", "/api/categorias/**").hasAnyRole("CLIENTE", "EMPLEADO", "GERENTE")
-                        .requestMatchers(HttpMethod.POST, "/api/productos/**", "/api/categorias/**").hasAnyRole("EMPLEADO", "GERENTE")
-                        .requestMatchers(HttpMethod.PUT, "/api/productos/**", "/api/categorias/**").hasAnyRole("EMPLEADO", "GERENTE")
-                        .requestMatchers(HttpMethod.DELETE, "/api/productos/**", "/api/categorias/**").hasRole("GERENTE")
-                        .requestMatchers("/api/ventas/**", "/api/detalle-ventas/**", "/api/inventario/**").hasAnyRole("EMPLEADO", "GERENTE")
-                        .requestMatchers("/api/carrito/**").hasAnyRole("CLIENTE", "EMPLEADO", "GERENTE")
+                        .requestMatchers("/api/usuarios/**").hasRole(GERENTE)
+                        .requestMatchers(HttpMethod.GET, "/api/productos/**", "/api/categorias/**").hasAnyRole(CLIENTE, EMPLEADO, GERENTE)
+                        .requestMatchers(HttpMethod.POST, "/api/productos/**", "/api/categorias/**").hasAnyRole(EMPLEADO, GERENTE)
+                        .requestMatchers(HttpMethod.PUT, "/api/productos/**", "/api/categorias/**").hasAnyRole(EMPLEADO, GERENTE)
+                        .requestMatchers(HttpMethod.DELETE, "/api/productos/**", "/api/categorias/**").hasRole(GERENTE)
+                        .requestMatchers("/api/ventas/**", "/api/detalle-ventas/**", "/api/inventario/**").hasAnyRole(EMPLEADO, GERENTE)
+                        .requestMatchers("/api/carrito/**").hasAnyRole(CLIENTE, EMPLEADO, GERENTE)
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
@@ -76,6 +80,7 @@ public class SecurityConfig {
         return (request, response, authException) -> {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setContentType("application/json");
+            response.setHeader("WWW-Authenticate", "Bearer");
             response.getWriter().write("{\"error\":\"No autenticado\",\"message\":\"Debe enviar un token JWT valido\"}");
         };
     }

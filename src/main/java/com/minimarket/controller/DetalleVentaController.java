@@ -1,6 +1,7 @@
 package com.minimarket.controller;
 
 import com.minimarket.entity.DetalleVenta;
+import com.minimarket.security.config.SecurityRoles;
 import com.minimarket.service.DetalleVentaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,26 +18,26 @@ public class DetalleVentaController {
     private DetalleVentaService detalleVentaService;
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('EMPLEADO','GERENTE')")
+    @PreAuthorize(SecurityRoles.HAS_ROLE_EMPLEADO_OR_GERENTE)
     public List<DetalleVenta> listarDetalleVentas() {
         return detalleVentaService.findAll();
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('EMPLEADO','GERENTE')")
+    @PreAuthorize(SecurityRoles.HAS_ROLE_EMPLEADO_OR_GERENTE)
     public ResponseEntity<DetalleVenta> obtenerDetalleVentaPorId(@PathVariable Long id) {
         DetalleVenta detalleVenta = detalleVentaService.findById(id);
         return (detalleVenta != null) ? ResponseEntity.ok(detalleVenta) : ResponseEntity.notFound().build();
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('EMPLEADO','GERENTE')")
+    @PreAuthorize(SecurityRoles.HAS_ROLE_EMPLEADO_OR_GERENTE)
     public DetalleVenta guardarDetalleVenta(@RequestBody DetalleVenta detalleVenta) {
         return detalleVentaService.save(detalleVenta);
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('EMPLEADO','GERENTE')")
+    @PreAuthorize(SecurityRoles.HAS_ROLE_EMPLEADO_OR_GERENTE)
     public ResponseEntity<DetalleVenta> actualizarDetalleVenta(@PathVariable Long id, @RequestBody DetalleVenta detalleVenta) {
         DetalleVenta existente = detalleVentaService.findById(id);
         if (existente != null) {
@@ -47,7 +48,7 @@ public class DetalleVentaController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('GERENTE')")
+    @PreAuthorize(SecurityRoles.HAS_ROLE_GERENTE)
     public ResponseEntity<Void> eliminarDetalleVenta(@PathVariable Long id) {
         DetalleVenta detalleVenta = detalleVentaService.findById(id);
         if (detalleVenta != null) {

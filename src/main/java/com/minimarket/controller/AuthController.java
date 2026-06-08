@@ -8,6 +8,7 @@ import com.minimarket.entity.Rol;
 import com.minimarket.entity.Usuario;
 import com.minimarket.repository.RolRepository;
 import com.minimarket.repository.UsuarioRepository;
+import com.minimarket.security.config.SecurityRoles;
 import com.minimarket.security.service.CustomUserDetailsService;
 import com.minimarket.security.util.JwtUtil;
 import jakarta.validation.Valid;
@@ -62,7 +63,7 @@ public class AuthController {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "El nombre de usuario ya existe");
         }
 
-        Rol cliente = rolRepository.findByNombre("ROLE_CLIENTE")
+        Rol cliente = rolRepository.findByNombre(SecurityRoles.ROLE_CLIENTE)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Rol CLIENTE no configurado"));
 
         Usuario usuario = new Usuario();

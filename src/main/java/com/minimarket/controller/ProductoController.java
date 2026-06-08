@@ -1,6 +1,7 @@
 package com.minimarket.controller;
 
 import com.minimarket.entity.Producto;
+import com.minimarket.security.config.SecurityRoles;
 import com.minimarket.service.ProductoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,26 +18,26 @@ public class ProductoController {
     private ProductoService productoService;
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('CLIENTE','EMPLEADO','GERENTE')")
+    @PreAuthorize(SecurityRoles.HAS_ROLE_CLIENTE_EMPLEADO_OR_GERENTE)
     public List<Producto> listarProductos() {
         return productoService.findAll();
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('CLIENTE','EMPLEADO','GERENTE')")
+    @PreAuthorize(SecurityRoles.HAS_ROLE_CLIENTE_EMPLEADO_OR_GERENTE)
     public ResponseEntity<Producto> obtenerProductoPorId(@PathVariable Long id) {
         Producto producto = productoService.findById(id);
         return (producto != null) ? ResponseEntity.ok(producto) : ResponseEntity.notFound().build();
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('EMPLEADO','GERENTE')")
+    @PreAuthorize(SecurityRoles.HAS_ROLE_EMPLEADO_OR_GERENTE)
     public Producto guardarProducto(@RequestBody Producto producto) {
         return productoService.save(producto);
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('EMPLEADO','GERENTE')")
+    @PreAuthorize(SecurityRoles.HAS_ROLE_EMPLEADO_OR_GERENTE)
     public ResponseEntity<Producto> actualizarProducto(@PathVariable Long id, @RequestBody Producto producto) {
         Producto productoExistente = productoService.findById(id);
         if (productoExistente != null) {
@@ -47,7 +48,7 @@ public class ProductoController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('GERENTE')")
+    @PreAuthorize(SecurityRoles.HAS_ROLE_GERENTE)
     public ResponseEntity<Void> eliminarProducto(@PathVariable Long id) {
         Producto producto = productoService.findById(id);
         if (producto != null) {

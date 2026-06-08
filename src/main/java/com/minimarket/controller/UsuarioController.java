@@ -2,6 +2,7 @@ package com.minimarket.controller;
 
 import com.minimarket.dto.usuario.UsuarioResponse;
 import com.minimarket.entity.Usuario;
+import com.minimarket.security.config.SecurityRoles;
 import com.minimarket.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,7 @@ public class UsuarioController {
     private UsuarioService usuarioService;
 
     @GetMapping
-    @PreAuthorize("hasRole('GERENTE')")
+    @PreAuthorize(SecurityRoles.HAS_ROLE_GERENTE)
     public List<UsuarioResponse> listarUsuarios() {
         return usuarioService.findAll().stream()
                 .map(UsuarioResponse::fromEntity)
@@ -28,7 +29,7 @@ public class UsuarioController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('GERENTE')")
+    @PreAuthorize(SecurityRoles.HAS_ROLE_GERENTE)
     public ResponseEntity<UsuarioResponse> obtenerUsuarioPorId(@PathVariable Long id) {
         Optional<Usuario> usuario = usuarioService.findById(id);
         return usuario.map(UsuarioResponse::fromEntity)
@@ -37,13 +38,13 @@ public class UsuarioController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('GERENTE')")
+    @PreAuthorize(SecurityRoles.HAS_ROLE_GERENTE)
     public Usuario guardarUsuario(@RequestBody Usuario usuario) {
         return usuarioService.save(usuario);
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('GERENTE')")
+    @PreAuthorize(SecurityRoles.HAS_ROLE_GERENTE)
     public ResponseEntity<Usuario> actualizarUsuario(@PathVariable Long id, @RequestBody Usuario usuario) {
         Optional<Usuario> usuarioExistente = usuarioService.findById(id);
         if (usuarioExistente.isPresent()) {
@@ -54,7 +55,7 @@ public class UsuarioController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('GERENTE')")
+    @PreAuthorize(SecurityRoles.HAS_ROLE_GERENTE)
     public ResponseEntity<Void> eliminarUsuario(@PathVariable Long id) {
         Optional<Usuario> usuario = usuarioService.findById(id);
         if (usuario.isPresent()) { // Verifica si el usuario existe

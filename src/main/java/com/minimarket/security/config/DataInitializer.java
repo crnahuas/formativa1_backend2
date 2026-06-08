@@ -41,9 +41,9 @@ public class DataInitializer implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         // 1. Inicializar Roles
-        Rol rolCliente = getOrCreateRol("ROLE_CLIENTE");
-        Rol rolEmpleado = getOrCreateRol("ROLE_EMPLEADO");
-        Rol rolGerente = getOrCreateRol("ROLE_GERENTE");
+        Rol rolCliente = getOrCreateRol(SecurityRoles.ROLE_CLIENTE);
+        Rol rolEmpleado = getOrCreateRol(SecurityRoles.ROLE_EMPLEADO);
+        Rol rolGerente = getOrCreateRol(SecurityRoles.ROLE_GERENTE);
 
         // 2. Inicializar Usuarios
         if (!usuarioRepository.findByUsername("gerente").isPresent()) {

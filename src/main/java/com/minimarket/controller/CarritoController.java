@@ -1,6 +1,7 @@
 package com.minimarket.controller;
 
 import com.minimarket.entity.Carrito;
+import com.minimarket.security.config.SecurityRoles;
 import com.minimarket.service.CarritoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,26 +18,26 @@ public class CarritoController {
     private CarritoService carritoService;
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('CLIENTE','EMPLEADO','GERENTE')")
+    @PreAuthorize(SecurityRoles.HAS_ROLE_CLIENTE_EMPLEADO_OR_GERENTE)
     public List<Carrito> listarCarrito() {
         return carritoService.findAll();
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('CLIENTE','EMPLEADO','GERENTE')")
+    @PreAuthorize(SecurityRoles.HAS_ROLE_CLIENTE_EMPLEADO_OR_GERENTE)
     public ResponseEntity<Carrito> obtenerCarritoPorId(@PathVariable Long id) {
         Carrito carrito = carritoService.findById(id);
         return (carrito != null) ? ResponseEntity.ok(carrito) : ResponseEntity.notFound().build();
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('CLIENTE','EMPLEADO','GERENTE')")
+    @PreAuthorize(SecurityRoles.HAS_ROLE_CLIENTE_EMPLEADO_OR_GERENTE)
     public Carrito agregarProductoAlCarrito(@RequestBody Carrito carrito) {
         return carritoService.save(carrito);
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('CLIENTE','EMPLEADO','GERENTE')")
+    @PreAuthorize(SecurityRoles.HAS_ROLE_CLIENTE_EMPLEADO_OR_GERENTE)
     public ResponseEntity<Carrito> actualizarCarrito(@PathVariable Long id, @RequestBody Carrito carrito) {
         Carrito existente = carritoService.findById(id);
         if (existente != null) {
@@ -47,7 +48,7 @@ public class CarritoController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('CLIENTE','EMPLEADO','GERENTE')")
+    @PreAuthorize(SecurityRoles.HAS_ROLE_CLIENTE_EMPLEADO_OR_GERENTE)
     public ResponseEntity<Void> eliminarProductoDelCarrito(@PathVariable Long id) {
         Carrito carrito = carritoService.findById(id);
         if (carrito != null) {
